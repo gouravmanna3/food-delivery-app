@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiRefreshFill } from "react-icons/ri";
 
@@ -7,12 +7,29 @@ import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
 import EmptyCart from "../img/emptyCart.svg";
 import CartItem from "./CartItem";
+import Swal from 'sweetalert2';
+import {CSVLink, CSVDownload} from 'react-csv';
 
 const CartContainer = () => {
   const [{ cartShow, cartItems, user }, dispatch] = useStateValue();
+  const csvLink = useRef()
   const [flag, setFlag] = useState(1);
   const [tot, setTot] = useState(0);
 
+  const showSwal = () => {
+    console.log('cart', cartItems);
+    console.log('user', user)
+    Swal.fire({
+      title: "Successful!",
+      text: "Your order is on the way",
+      icon: "success",
+    });
+    csvLink.current.link.click();
+    clearCart();
+    showCart();
+  
+  }
+  
   const showCart = () => {
     dispatch({
       type: actionType.SET_CART_SHOW,
@@ -58,6 +75,13 @@ const CartContainer = () => {
           Clear <RiRefreshFill />
         </motion.p>
       </div>
+      <CSVLink
+            data={[...cartItems]}
+            filename="order.csv"
+            className="hidden"
+            ref={csvLink}
+            target="_blank"
+          />
 
       {/* bottom section */}
       {cartItems && cartItems.length > 0 ? (
@@ -101,7 +125,8 @@ const CartContainer = () => {
               <motion.button
                 whileTap={{ scale: 0.8 }}
                 type="button"
-                className="w-full p-2 rounded-full bg-gradient-to-tr from-orange-400 to-orange-600 text-gray-50 text-lg my-2 hover:shadow-lg"
+                className="w-full p-2 rounded-full bg-gradient-to-tr from-lime-400 to-lime-600 text-gray-50 text-lg my-2 hover:shadow-lg"
+                onClick={showSwal}
               >
                 Check Out
               </motion.button>
@@ -110,6 +135,7 @@ const CartContainer = () => {
                 whileTap={{ scale: 0.8 }}
                 type="button"
                 className="w-full p-2 rounded-full bg-gradient-to-tr from-orange-400 to-orange-600 text-gray-50 text-lg my-2 hover:shadow-lg"
+                
               >
                 Login to check out
               </motion.button>
